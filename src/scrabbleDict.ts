@@ -1,3 +1,6 @@
+import * as fs from 'fs';
+import * as path from 'path';
+
 const END = '$';
 const WILD = '?';
 
@@ -19,10 +22,10 @@ class _Dawg {
         return { more, letter, link };
     }
 
-    private _get_child(index: number, letter: string) {
+    private _get_child(index: number, targetLetter: string) {
         while (true) {
-            const { more, other, link } = this._get_record(index);
-            if (other === letter) {
+            const { more, letter, link } = this._get_record(index);
+            if (letter === targetLetter) {
                 return link;
             }
             if (!more) {
@@ -126,27 +129,40 @@ class _Dawg {
     }
 }
 
-async function initializeDawg() {
-    const rawData = await import('./assets/data.txt');
-    // Remove " and \n characters
-    const base64Data = rawData.default.replace(/["\n]/g, '');
-    return new _Dawg(base64Data);
+export let _DAWG: _Dawg | null = null;
+
+export async function initializeDawg(): Promise<void> {
+    const filePath = path.resolve(__dirname, '../assets/data.txt');
+    const data = fs.readFileSync(filePath, 'utf-8');
+    const cleanedData = data.replace(/"/g, '').replace(/\n/g, '');
+    _DAWG = new _Dawg(cleanedData);
 }
 
-export const _DAWG = initializeDawg();
-
-function check(word: string) {
+export async function check(word: string): Promise<boolean> {
+    if (!_DAWG) {
+        throw new Error('DAWG not initialized. Please run initializeDawg() before using.');
+    }
     return _DAWG.contains(word);
 }
 
-function iterator() {
+export async function iterator(): Promise<IterableIterator<string>> {
+    if (!_DAWG) {
+        throw new Error('DAWG not initialized. Please run initializeDawg() before using.');
+    }
     return _DAWG.iterator();
 }
 
-function children(prefix: string) {
+export async function children(prefix: string): Promise<string[]> {
+    if (!_DAWG) {
+        throw new Error('DAWG not initialized. Please run initializeDawg() before using.');
+    }
     return _DAWG.children(prefix);
 }
 
-function anagram(letters: string) {
+export async function anagram(letters: string): Promise<IterableIterator<string>> {
+    if (!_DAWG) {
+        throw new Error('DAWG not initialized. Please run initializeDawg() before using.');
+    }
     return _DAWG.anagram(letters);
 }
+
