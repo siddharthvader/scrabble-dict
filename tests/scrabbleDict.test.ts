@@ -45,6 +45,4 @@ describe('Scrabble Dictionary', () => {
     const result2 = await check('wOrD');
     expect(result1).toBe(result2);
   });
-
-  // Add more tests as needed...
 });

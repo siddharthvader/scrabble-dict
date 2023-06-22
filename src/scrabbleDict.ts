@@ -1,7 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { defaultdict } from 'collections';
-// import zlib from 'zlib';
 import base64 from 'base64-js';
 
 const END = '$';
@@ -11,10 +10,8 @@ class _Dawg {
     private data: Buffer;
 
     constructor(data: string) {
-        // this.data = Buffer.from(data, 'base64');
-        // this.data = Buffer.from(this.data.buffer, 0, this.data.byteLength); // Decompression is assumed to be handled outside
         let buffer = Buffer.from(data, 'base64');
-        let decompressed = require('zlib').inflateSync(buffer); // You can use different methods for decompression based on your input data, e.g., unzipSync
+        let decompressed = require('zlib').inflateSync(buffer);
         this.data = decompressed;
         this._anagram = this._anagram.bind(this);
     }
@@ -179,7 +176,7 @@ export async function* anagram(letters: string): AsyncIterableIterator<string> {
 
     const bag = defaultdict<number>(0);
     for (const letter of letters) {
-        bag[letter] = (bag[letter] || 0) + 1; // make sure the key exists before incrementing
+        bag[letter] = (bag[letter] || 0) + 1;
     }
 
     for await (const word of _DAWG._anagram(bag)) {
