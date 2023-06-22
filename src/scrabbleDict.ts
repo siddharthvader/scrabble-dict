@@ -1,5 +1,8 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import { defaultdict } from 'collections';
+// import zlib from 'zlib';
+import base64 from 'base64-js';
 
 const END = '$';
 const WILD = '?';
@@ -8,8 +11,12 @@ class _Dawg {
     private data: Buffer;
 
     constructor(data: string) {
-        this.data = Buffer.from(data, 'base64');
-        this.data = Buffer.from(this.data.buffer, 0, this.data.byteLength); // Decompression is assumed to be handled outside
+        // this.data = Buffer.from(data, 'base64');
+        // this.data = Buffer.from(this.data.buffer, 0, this.data.byteLength); // Decompression is assumed to be handled outside
+        let buffer = Buffer.from(data, 'base64');
+        let decompressed = require('zlib').inflateSync(buffer); // You can use different methods for decompression based on your input data, e.g., unzipSync
+        this.data = decompressed;
+        this._anagram = this._anagram.bind(this);
     }
 
     private _get_record(index: number) {
@@ -48,27 +55,27 @@ class _Dawg {
         return result;
     }
 
-    private *_anagram(bag: Map<string, number>, index = 0, letters: string[] = []) {
+    public async* _anagram(bag: any, index = 0, letters: string[] = []) {
         while (true) {
             const { more, letter, link } = this._get_record(index);
             if (letter === END) {
                 yield letters.join('');
-            } else if (bag.get(letter)) {
-                bag.set(letter, bag.get(letter) - 1);
+            } else if (bag[letter]) {
+                bag[letter] -= 1;
                 letters.push(letter);
-                for (const word of this._anagram(bag, link, letters)) {
+                for await (const word of this._anagram(bag, link, letters)) {
                     yield word;
                 }
                 letters.pop();
-                bag.set(letter, bag.get(letter) + 1);
-            } else if (bag.get(WILD)) {
-                bag.set(WILD, bag.get(WILD) - 1);
+                bag[letter] += 1;
+            } else if (bag[WILD]) {
+                bag[WILD] -= 1;
                 letters.push(letter);
-                for (const word of this._anagram(bag, link, letters)) {
+                for await (const word of this._anagram(bag, link, letters)) {
                     yield word;
                 }
                 letters.pop();
-                bag.set(WILD, bag.get(WILD) + 1);
+                bag[WILD] += 1;
             }
             if (!more) {
                 break;
@@ -134,7 +141,7 @@ export let _DAWG: _Dawg | null = null;
 export async function initializeDawg(): Promise<void> {
     const filePath = path.resolve(__dirname, '../assets/data.txt');
     const data = fs.readFileSync(filePath, 'utf-8');
-    const cleanedData = data.replace(/"/g, '').replace(/\n/g, '');
+    const cleanedData = data.replace(/"/g, '').replace(/\n/g, '');    
     _DAWG = new _Dawg(cleanedData);
 }
 
@@ -159,10 +166,25 @@ export async function children(prefix: string): Promise<string[]> {
     return _DAWG.children(prefix);
 }
 
-export async function anagram(letters: string): Promise<IterableIterator<string>> {
+function defaultdict<T>(defaultValue: T) {
+    return new Proxy<any>({}, {
+        get: (target, name) => name in target ? target[name] : defaultValue
+    });
+}
+
+export async function* anagram(letters: string): AsyncIterableIterator<string> {
     if (!_DAWG) {
         throw new Error('DAWG not initialized. Please run initializeDawg() before using.');
     }
-    return _DAWG.anagram(letters);
+
+    const bag = defaultdict<number>(0);
+    for (const letter of letters) {
+        bag[letter] = (bag[letter] || 0) + 1; // make sure the key exists before incrementing
+    }
+
+    for await (const word of _DAWG._anagram(bag)) {
+        yield word;
+    }
 }
+
 
