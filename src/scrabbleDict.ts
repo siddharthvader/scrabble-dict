@@ -1,6 +1,5 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { defaultdict } from 'collections';
 import base64 from 'base64-js';
 
 const END = '$';
@@ -16,7 +15,10 @@ class _Dawg {
         this._anagram = this._anagram.bind(this);
     }
 
-    private _get_record(index: number) {
+    private _get_record(index: number | null) {
+        if (index === null){
+            return null
+        }
         const a = index * 4;
         const b = index * 4 + 4;
         const x = this.data.readUInt32LE(a);
@@ -26,23 +28,33 @@ class _Dawg {
         return { more, letter, link };
     }
 
-    private _get_child(index: number, targetLetter: string) {
+    private _get_child(index: number | null, targetLetter: string): number | null{
         while (true) {
-            const { more, letter, link } = this._get_record(index);
+            const record = this._get_record(index);
+            if (record === null || index === null) {
+                return null;
+            }
+            
+            const { more, letter, link } = record;
             if (letter === targetLetter) {
                 return link;
             }
-            if (!more) {
+            if (!more || index === null) {
                 return null;
             }
             index += 1;
         }
     }
 
-    private _get_children(index: number) {
+    private _get_children(index: number | null) {
         const result = [];
         while (true) {
-            const { more, letter, link } = this._get_record(index);
+            const record = this._get_record(index);
+            if (record === null || index === null) {
+                return null;
+            }
+            
+            const { more, letter, link } = record;
             result.push(letter);
             if (!more) {
                 break;
@@ -52,9 +64,14 @@ class _Dawg {
         return result;
     }
 
-    public async* _anagram(bag: any, index = 0, letters: string[] = []) {
+    public async* _anagram(bag: any, index = 0, letters: string[] = []): AsyncIterableIterator<string> {
         while (true) {
-            const { more, letter, link } = this._get_record(index);
+            const record = this._get_record(index);
+            if (record === null || index === null) {
+                return null;
+            }
+            
+            const { more, letter, link } = record;
             if (letter === END) {
                 yield letters.join('');
             } else if (bag[letter]) {
@@ -82,7 +99,7 @@ class _Dawg {
     }
 
     contains(word: string) {
-        let index = 0;
+        let index: number | null = 0;
         for (const letter of [...word, END]) {
             index = this._get_child(index, letter);
             if (index === null) {
@@ -92,9 +109,14 @@ class _Dawg {
         return true;
     }
 
-    *iterator(index = 0, letters: string[] = []) {
+    *iterator(index = 0, letters: string[] = []): IterableIterator<string> {
         while (true) {
-            const { more, letter, link } = this._get_record(index);
+            const record = this._get_record(index);
+            if (record === null || index === null) {
+                return null;
+            }
+            
+            const { more, letter, link } = record;
             if (letter === END) {
                 yield letters.join('');
             } else {
@@ -112,7 +134,7 @@ class _Dawg {
     }
 
     children(prefix: string) {
-        let index = 0;
+        let index: number | null = 0;
         for (const letter of prefix) {
             index = this._get_child(index, letter);
             if ([0, null].includes(index)) {
@@ -122,12 +144,12 @@ class _Dawg {
         return this._get_children(index);
     }
 
-    *anagram(letters: string) {
+    public async *anagram(letters: string) {
         const bag = new Map<string, number>();
         for (const letter of letters) {
             bag.set(letter, (bag.get(letter) || 0) + 1);
         }
-        for (const word of this._anagram(bag)) {
+        for await (const word of this._anagram(bag)) {
             yield word;
         }
     }
@@ -160,7 +182,7 @@ export async function children(prefix: string): Promise<string[]> {
     if (!_DAWG) {
         throw new Error('DAWG not initialized. Please run initializeDawg() before using.');
     }
-    return _DAWG.children(prefix);
+    return _DAWG.children(prefix) || [];
 }
 
 function defaultdict<T>(defaultValue: T) {

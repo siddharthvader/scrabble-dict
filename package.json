@@ -1,13 +1,13 @@
 {
   "name": "scrabble-dict",
   "version": "1.0.0",
-  "description": "",
+  "description": "in memory scrabble dictionary for word games",
   "main": "index.ts",
   "scripts": {
     "test": "jest"
   },
   "keywords": [],
-  "author": "",
+  "author": "siddharth ramakrishnan",
   "license": "ISC",
   "devDependencies": {
     "@types/jest": "^29.5.2",
@@ -34,5 +34,16 @@
     "collections": "^5.1.13",
     "pako": "^2.1.0",
     "zlib": "^1.0.5"
-  }
+  },
+  "directories": {
+    "test": "tests"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/siddharthvader/scrabble-dict.git"
+  },
+  "bugs": {
+    "url": "https://github.com/siddharthvader/scrabble-dict/issues"
+  },
+  "homepage": "https://github.com/siddharthvader/scrabble-dict#readme"
 }
