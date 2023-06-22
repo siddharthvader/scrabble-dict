@@ -1,6 +1,6 @@
-# Scrabble Dictionary [Package Name]
+# Scrabble Dictionary [scrabble-dict]
 
-[![npm version](https://badge.fury.io/js/your-package-name.svg)](https://badge.fury.io/js/your-package-name)
+(https://badge.fury.io/js/scrabble-dict)
 
 Scrabble Dictionary is a JavaScript/TypeScript library that can be used in browsers for word games like Scrabble, Words with Friends, and others. It provides an efficient way to check the validity of words, find anagrams, and more. It's perfect for game developers or enthusiasts looking to add dictionary functionality to their web-based word games.
 
@@ -14,7 +14,7 @@ Scrabble Dictionary is a JavaScript/TypeScript library that can be used in brows
 
 Install the package via npm:
 
-[INSERT INSTALLATION CODE BLOCK HERE]
+`npm install scrabble-dict`
 
 ## Usage
 
@@ -22,22 +22,25 @@ Install the package via npm:
 
 Import the library in your JavaScript or TypeScript file:
 
-npm install scrabble-dict
+`import 'scrabble-dict';`
 
 ### Initializing the Dictionary
 
 Before you can use the dictionary, you need to initialize it. This is typically done once at the start of your application.
 
+```
 import { initializeDawg } from 'scrabble-dict';
 
 (async () => {
     await initializeDawg();
 })();
+```
 
 ### Checking if a Word Exists
 
 To check if a word exists in the dictionary, use the `check` method:
 
+```
 import { check } from 'scrabble-dict';
 
 (async () => {
@@ -46,11 +49,13 @@ import { check } from 'scrabble-dict';
 
     console.log(`Does the word "${word}" exist? ${exists ? 'Yes' : 'No'}`);
 })();
+```
 
 ### Finding Children
 
 To find all possible children of a given set of letters, use the `children` method:
 
+```
 import { children } from 'scrabble-dict';
 
 (async () => {
@@ -59,11 +64,13 @@ import { children } from 'scrabble-dict';
 
     console.log(`Children of the prefix "${prefix}":`, childWords);
 })();
+```
 
 ### Finding Anagrams
 
 To find all possible anagrams of a given set of letters, use the `anagram` method:
 
+```
 import { anagram } from 'scrabble-dict';
 
 (async () => {
@@ -73,6 +80,7 @@ import { anagram } from 'scrabble-dict';
         console.log(`An anagram of "${letters}": ${word}`);
     }
 })();
+```
 
 ## Contributing
 
