@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "in memory scrabble dictionary for word games",
   "main": "src/index.ts",
-  "files": ["src/index.js", "src/scrableDict.js"],
+  "files": ["src/index.js", "src/scrableDict.js", "README.md"],
   "scripts": {
     "test": "jest"
   },
