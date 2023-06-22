@@ -1,6 +1,6 @@
 # Scrabble Dictionary [scrabble-dict]
 
-(https://badge.fury.io/js/scrabble-dict)
+(https://badge.fury.io/js/scrabble-dict) (https://www.npmjs.com/package/scrabble-dict)
 
 Taken from https://github.com/fogleman/TWL06
 
