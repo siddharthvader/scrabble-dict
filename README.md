@@ -2,6 +2,8 @@
 
 (https://badge.fury.io/js/scrabble-dict)
 
+Taken from https://github.com/fogleman/TWL06
+
 Scrabble Dictionary is a JavaScript/TypeScript library that can be used in browsers for word games like Scrabble, Words with Friends, and others. It provides an efficient way to check the validity of words, find anagrams, and more. It's perfect for game developers or enthusiasts looking to add dictionary functionality to their web-based word games.
 
 ## Features
