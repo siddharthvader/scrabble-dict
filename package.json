@@ -1,6 +1,6 @@
 {
   "name": "scrabble-dict",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "in memory scrabble dictionary for word games",
   "main": "src/index.ts",
   "files": ["src/index.js", "src/scrableDict.js", "README.md"],
